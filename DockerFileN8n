@@ -1,0 +1,22 @@
+FROM n8nio/n8n:1.112.0
+
+# Mudar para root para poder instalar pacotes
+USER root
+
+# Instalar Chromium + dependências no Alpine
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    bash \
+    wget \
+    udev
+
+# Definir Chromium como navegador default do Puppeteer
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
+# Voltar para o usuário padrão do n8n
+USER node
