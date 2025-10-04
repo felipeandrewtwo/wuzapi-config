@@ -1,0 +1,42 @@
+N8N_PORT=5678
+N8N_HOST=host.docker.internal
+N8N_WEBHOOK_URL=http://${N8N_HOST}:${N8N_PORT}
+TIMEZONE=America/Sao_Paulo
+
+
+  n8n:
+    image: n8nio/n8n:latest
+    platform: linux/amd64
+    env_file:
+    - .env
+    environment:
+      WEBHOOK_URL: ${N8N_WEBHOOK_URL}
+      N8N_HOST: ${N8N_HOST}
+      GENERIC_TIMEZONE: ${TIMEZONE}
+      N8N_LOG_LEVEL: debug
+      N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE: true
+    volumes:
+      - n8n_data:/home/node/.n8n
+    ports:
+      - "${N8N_PORT}:${N8N_PORT}"
+
+---------------------------
+
+session : "{{ $json.body.token }}"
+chatId : "{{ $json.body.event.Info.Chat }}"
+pushName : "{{ $json.body.event.Info.PushName }}"
+event : "{{ $json.body.type }}"
+message : {{ $json.body.event.Message.conversation }}
+idBody : "{{ $json.body.event.Info.ID }}"
+fromMe : "{{ $json.body.event.Info.IsFromMe }}"
+
+
+-------
+
+{{ $json["event"] === "Message" 
+   && $json["message"] && $json["message"].includes("!bot") }}
+   
+   
+-------
+prompt
+{{$json.message}}
