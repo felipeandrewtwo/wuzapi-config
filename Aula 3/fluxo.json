@@ -1,0 +1,393 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9d21a7da-f055-409c-9866-7526936c4bfb",
+              "name": "session",
+              "value": "={{ $json.body.token }}",
+              "type": "string"
+            },
+            {
+              "id": "4195c8cc-9a95-4ed0-8c8c-b75e64e75aad",
+              "name": "chatId",
+              "value": "={{$json.body.event.Info.Chat }}",
+              "type": "string"
+            },
+            {
+              "id": "8d25d8ae-8649-45fe-ba14-45972ea4a88c",
+              "name": "pushName",
+              "value": "={{ $json.body.event.Info.PushName }}",
+              "type": "string"
+            },
+            {
+              "id": "d04e410e-342e-434c-a808-653f098009c3",
+              "name": "IdPayload",
+              "value": "={{ $json.body.event.Info.ID }}",
+              "type": "string"
+            },
+            {
+              "id": "0ef9cfdd-80cd-4aba-9fad-c67782a6c0ef",
+              "name": "event",
+              "value": "={{ $json.body.type }}",
+              "type": "string"
+            },
+            {
+              "id": "63be41eb-48e7-494b-9605-1f2334bcec56",
+              "name": "message",
+              "value": "={{ $json.body.event.Message.conversation }}",
+              "type": "string"
+            },
+            {
+              "id": "0875f5da-8fb9-4c78-9b3c-17f1f6ff8af4",
+              "name": "fromMe",
+              "value": "={{ $json.body.event.Info.IsFromMe }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -288,
+        48
+      ],
+      "id": "c4512ffa-dc4e-454b-adfb-7c02f11ca69d",
+      "name": "DataMapper"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{$json.message}}",
+        "options": {
+          "systemMessage": "Você é um agente especializado em montar links de busca de passagens aéreas da Azul Linhas Aéreas.\n\n🎯 Sua tarefa\n\nReceber uma mensagem em linguagem natural que contém:\n\nOrigem (cidade ou código IATA)\n\nDestino (cidade ou código IATA)\n\nData de ida\n\nData de volta\n\nQuantidade de passageiros (se não for informado, considerar 1 adulto).\n\nConverter esses dados para o formato correto da URL de busca da Azul:\n\nhttps://www.voeazul.com.br/br/pt/home/selecao-voo?c[0].ds=ORIGEM&c[0].std=MM/DD/YYYY&c[0].as=DESTINO&c[1].ds=DESTINO&c[1].std=MM/DD/YYYY&c[1].as=ORIGEM&p[0].t=ADT&p[0].c=QTD&p[0].cp=false&f.dl=3&f.dr=3&cc=PTS\n\n\nRegras de formatação:\n\nDatas devem estar no formato MM/DD/YYYY (mês/dia/ano).\n\nSempre usar pontos (PTS).\n\nSempre ordenar pelo mais barato primeiro.\n\nPassageiros sempre no formato:\n\np[0].t=ADT (adulto)\n\np[0].c=QTD (quantidade)\n\n✈️ Lista de principais códigos IATA\n\nGRU → São Paulo / Guarulhos\n\nCGH → São Paulo / Congonhas\n\nVCP → Campinas / Viracopos\n\nJPA → João Pessoa\n\nREC → Recife\n\nSSA → Salvador\n\nFOR → Fortaleza\n\nNAT → Natal\n\nGIG → Rio de Janeiro / Galeão\n\nSDU → Rio de Janeiro / Santos Dumont\n\nCNF → Belo Horizonte / Confins\n\nPOA → Porto Alegre\n\nCWB → Curitiba\n\nBSB → Brasília\n\nMAO → Manaus\n\nBEL → Belém\n\nMCZ → Maceió\n\nSLZ → São Luís\n\nTHE → Teresina\n\nCGB → Cuiabá\n\nPMW → Palmas\n\nIGU → Foz do Iguaçu\n\n(pode expandir a lista conforme necessidade)\n\n📌 Exemplo de uso\n\nEntrada (WhatsApp):\n\nQuero passagem de João Pessoa para São Paulo ida dia 3 de novembro e volta dia 6 de novembro, 2 adultos.\n\nSaída (URL):\n\nhttps://www.voeazul.com.br/br/pt/home/selecao-voo?c[0].ds=JPA&c[0].std=11/03/2025&c[0].as=GRU&c[1].ds=GRU&c[1].std=11/06/2025&c[1].as=JPA&p[0].t=ADT&p[0].c=2&p[0].cp=false&f.dl=3&f.dr=3&cc=PTS\n\n\nOBS: a saída deve ser apenas a URL, nada mais.\n\nMais informações\n\nQuebra por parâmetros:\nIda (c[0]):\n\nc[0].ds=JPA → Origem: João Pessoa (JPA)\n\nc[0].std=10/30/2025 → Data da ida: 30/10/2025\n\nc[0].as=GRU → Destino: São Paulo / Guarulhos (GRU)\n\nVolta (c[1]):\n\nc[1].ds=GRU → Origem da volta: São Paulo / Guarulhos (GRU)\n\nc[1].std=11/03/2025 → Data da volta: 03/11/2025\n\nc[1].as=JPA → Destino da volta: João Pessoa (JPA)\n\n⚠️ Aqui está a confusão:\nVocê mencionou que queria ida em 03/11 e volta em 06/11, mas o link está configurado como ida em 30/10 e volta em 03/11.\nA Azul usa o formato MM/DD/YYYY, não DD/MM/YYYY.\n\nPassageiros (p[0]):\n\np[0].t=ADT → Tipo: Adulto\n\np[0].c=1 → 1 adulto\n\np[0].cp=false → Sem acompanhante promocional\n\nFiltros (f):\n\nf.dl=3 → Critério de ordenação: mais barato primeiro\n\nf.dr=3 → Direção da ordenação: crescente (menor valor primeiro)\n\nOutros:\n\ncc=PTS → Exibição em pontos TudoAzul"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        48
+      ],
+      "id": "0ade156f-2d6a-473f-a10b-60ebfaaf9a48",
+      "name": "IA - Montar Link"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json[\"event\"] === \"Message\" \n   && $json[\"message\"] && $json[\"message\"].includes(\"!buscador\") }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "f6382375-4cba-4a53-96a3-5608f17edf3c"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -144,
+        48
+      ],
+      "id": "d1a5f573-480f-4ef4-9dc4-92ac094c0ab9",
+      "name": "Rota de busca"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        64,
+        320
+      ],
+      "id": "b1d473b2-8b3e-415d-9f08-3b4cd64802a7",
+      "name": "Gemini 2.5 Flash lite",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "FK7l06QobEhMaHj0",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/chat/send/image",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "1234ABCD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"Phone\": \"{{ $('DataMapper').item.json.chatId }}\",\n  \"Image\": \"{{ $('Gerar imagem').item.json.image }}\",\n  \"Caption\": \"Passagens Azul\",\n  \"Id\": \"{{ $('DataMapper').item.json.IdPayload }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1008,
+        288
+      ],
+      "id": "4125ae3a-5b9a-4ff9-b90d-c49f4f054a83",
+      "name": "Response"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -448,
+        48
+      ],
+      "id": "31d8972f-217a-40bd-9060-83582fb1108d",
+      "name": "Webhook",
+      "webhookId": "e53bb7ec-d6fe-456a-8ea3-9160c7a7b388",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "operation": "runCustomScript",
+        "scriptCode": "// Puppeteer runCustomScript - pega HTML do item anterior e retorna PNG base64\n\n// Tenta obter o HTML (ajuste a chave se necessário)\nconst html = $json.output\n\n// Define o conteúdo da página corretamente (NÃO stringify)\nawait $page.setContent(html, { waitUntil: 'networkidle0' });\n\n// Opcional: espera fontes/carregamentos adicionais (se necessário)\n// await $page.waitForTimeout(200);\n\n// Faz screenshot em PNG e retorna base64\nconst screenshotBase64 = await $page.screenshot({ type: 'png', fullPage: true, encoding: 'base64' });\n\n// Retorna o base64 para o fluxo (campo image)\nreturn [{\n  json: {\n    image: 'data:image/png;base64,' + screenshotBase64\n  }\n}];\n {{ $json.output }}",
+        "options": {
+          "proxyServer": ""
+        }
+      },
+      "type": "n8n-nodes-puppeteer.puppeteer",
+      "typeVersion": 1,
+      "position": [
+        640,
+        288
+      ],
+      "id": "47ad57a6-241c-4916-92f4-f4b637f050e6",
+      "name": "Gerar imagem",
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "runCustomScript",
+        "scriptCode": "// 1. Navega para a página desejada\nconst url = $json.output;\n\nawait $page.goto(url, { waitUntil: 'networkidle2' });\n\n// 2. Aguarda até que pelo menos um elemento com a classe \"trip-container\" esteja presente\nawait $page.waitForSelector('.trip-container', { timeout: 20000 }); // até 20s de espera\n\n// 3. Extrai o HTML de todos os elementos com a classe \"trip-container\"\nconst trips = await $page.evaluate(() => {\n    return Array.from(document.querySelectorAll('.trip-container'))\n        .map(el => el.innerHTML);\n});\n\n// 4. Log para debug\nconsole.log(\"Trip-containers encontrados:\", trips.length);\n\n// 5. Retorna no formato esperado pelo n8n (um array de objetos)\nreturn trips.map(html => ({\n    tripContainer: html,\n    ...$json\n}));\n",
+        "options": {
+          "proxyServer": ""
+        }
+      },
+      "type": "n8n-nodes-puppeteer.puppeteer",
+      "typeVersion": 1,
+      "position": [
+        400,
+        48
+      ],
+      "id": "24e55486-d323-456c-8503-fb077e2573a9",
+      "name": "Scrapying",
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.tripContainer }}",
+        "options": {
+          "systemMessage": "Você é um agente especializado em EXTRAÇÃO E ESTRUTURAÇÃO DE DADOS a partir de HTML bruto, focado em [[tema]].\n\n## Função principal:\n- Receber um conteúdo HTML (completo ou parcial) de resultados de busca de [[tema]].\n- Extrair todos os DADOS RELEVANTES e estruture em um HTML\n\ncomo este:\n\n<!doctype html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"utf-8\" />\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" />\n  <style>\n    :root {\n      --bg: #f4f5f7;\n      --card: #ffffff;\n      --accent: #007bff;\n      --muted: #666;\n      --success: #28a745;\n      --th: #f0f6ff;\n      --border: #e9eef6;\n    }\n\n    body {\n      font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;\n      margin: 0;\n      background: var(--bg);\n      color: #1b1f23;\n      padding: 18px;\n    }\n\n    .container {\n      max-width: 820px;\n      margin: 0 auto;\n    }\n\n    .title {\n      text-align: center;\n      font-weight: 700;\n      margin-bottom: 12px;\n      font-size: 18px;\n    }\n\n    .table-wrap {\n      background: var(--card);\n      border-radius: 10px;\n      box-shadow: 0 6px 18px rgba(19, 24, 30, 0.06);\n      overflow: hidden;\n      border: 1px solid var(--border);\n    }\n\n    .scroll {\n      overflow-x: auto;\n    }\n\n    table.data-table {\n      width: 100%;\n      border-collapse: collapse;\n      table-layout: fixed;\n      min-width: 700px;\n    }\n\n    thead th {\n      background: var(--th);\n      text-align: left;\n      font-weight: 700;\n      padding: 12px 14px;\n      font-size: 13px;\n      color: #0f1724;\n    }\n\n    tbody td {\n      padding: 12px 14px;\n      border-bottom: 1px solid #f1f4f8;\n      vertical-align: middle;\n      font-size: 13px;\n    }\n\n    .highlight {\n      color: var(--accent);\n      font-weight: 600;\n    }\n\n    .muted {\n      color: var(--muted);\n      font-size: 12.5px;\n    }\n\n    .numeric {\n      text-align: right;\n    }\n\n    @media (max-width: 600px) {\n      table.data-table {\n        min-width: 640px;\n      }\n    }\n  </style>\n</head>\n\n<body>\n  <div class=\"container\">\n    <div class=\"title\">📊 Tabela de Dados</div>\n    <div class=\"table-wrap\">\n      <div class=\"scroll\">\n        <table class=\"data-table\" role=\"table\" aria-label=\"Tabela de dados genérica\">\n          <thead>\n            <tr>\n              <th>Coluna 1</th>\n              <th>Coluna 2</th>\n              <th>Coluna 3</th>\n              <th>Coluna 4</th>\n              <th>Coluna 5</th>\n              <th>Coluna 6</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr>\n              <td>Valor A1</td>\n              <td>Valor A2</td>\n              <td>Valor A3</td>\n              <td>Valor A4</td>\n              <td class=\"numeric\">123</td>\n              <td class=\"numeric\">456</td>\n            </tr>\n            <tr>\n              <td>Valor B1</td>\n              <td>Valor B2</td>\n              <td>Valor B3</td>\n              <td>Valor B4</td>\n              <td class=\"numeric\">789</td>\n              <td class=\"numeric\">101</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n</body>\n</html>\n\nuse os estilos e produza uma página com tabela bonita mostrando os dados relevantes\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        368,
+        288
+      ],
+      "id": "f1749896-39b1-4855-a69c-1ef41c7e2e95",
+      "name": "AI - Gerar JSON"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8080/chat/markread",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "1234ABCD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"Id\": [\n    \"{{ $('DataMapper').item.json.IdPayload }}\"\n  ],\n  \"Chat\": \"{{ $('DataMapper').item.json.chatId }}\",\n  \"Sender\": \"{{ $('Webhook').item.json.body.event.Info.SenderAlt }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        816,
+        288
+      ],
+      "id": "f6376aa2-9119-436c-958a-fd8216a02df4",
+      "name": "Mark Read"
+    },
+    {
+      "parameters": {
+        "content": "Configuração Gemini IA",
+        "height": 464,
+        "width": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8688f7a1-f63a-4136-9a48-3518bf943f8d",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "DataMapper": {
+      "main": [
+        [
+          {
+            "node": "Rota de busca",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IA - Montar Link": {
+      "main": [
+        [
+          {
+            "node": "Scrapying",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rota de busca": {
+      "main": [
+        [
+          {
+            "node": "IA - Montar Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini 2.5 Flash lite": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "IA - Montar Link",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI - Gerar JSON",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "DataMapper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar imagem": {
+      "main": [
+        [
+          {
+            "node": "Mark Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrapying": {
+      "main": [
+        [
+          {
+            "node": "AI - Gerar JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI - Gerar JSON": {
+      "main": [
+        [
+          {
+            "node": "Gerar imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Read": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "fc7fca3f7caccaf64a76d4e3e051bc3d838ce9ce64f91ad0e24ea05469557dc1"
+  }
+}
