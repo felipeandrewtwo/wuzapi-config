@@ -1,0 +1,44 @@
+
+# MAPEAMENTO DOS DADOS
+
+session : "{{ $json.body.token }}"
+chatId : "{{ $json.body.event.Info.Chat }}"
+pushName : "{{ $json.body.event.Info.PushName }}"
+event : "{{ $json.body.type }}"
+message : {{ $json.body.event.Message.conversation }}
+idBody : "{{ $json.body.event.Info.ID }}"
+fromMe : "{{ $json.body.event.Info.IsFromMe }}"
+
+-------
+
+## SWITCH ROUTEADOR
+
+{{ $json["event"] === "Message" 
+   && $json["message"] && $json["message"].includes("!bot") }}
+   
+-------
+## SYSTEM PROMPT DO AGENTE
+
+prompt
+{{$json.message}}
+
+-------
+## LEITURA
+
+{
+  "Id": [
+    "{{ $('DataMapper').item.json.IdPayload }}"
+  ],
+  "Chat": "{{ $('DataMapper').item.json.chatId }}",
+  "Sender": "{{ $('Webhook').item.json.body.event.Info.SenderAlt }}"
+}
+
+
+## RESPOSTA HTTP
+
+{
+  "Phone": "{{ $('DataMapper').item.json.chatId }}",
+  "Image": "{{ $('Gerar imagem').item.json.image }}",
+  "Caption": "Passagens Azul",
+  "Id": "{{ $('DataMapper').item.json.IdPayload }}"
+}
